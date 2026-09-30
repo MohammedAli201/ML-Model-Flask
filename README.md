@@ -1,6 +1,17 @@
-# Iris Classifier with Flask
+# Iris Classifier
+<sub>PYTHON · FLASK · SCIKIT-LEARN · RANDOM FOREST</sub>
 
-A small end-to-end machine-learning exercise: train a Random Forest on four flower measurements, save the full preprocessing pipeline and serve predictions through a Flask form.
+Four flower measurements go into a trained pipeline. A Flask form validates the input and returns the predicted species.
+
+![The actual Iris classifier with a synthetic measurement example](docs/iris-demo.png)
+
+[Model walkthrough](docs/model-walkthrough.md) · [Training pipeline](train.py) · [Regression tests](tests/test_prediction.py)
+
+## Why this example is useful
+
+Training and inference share one saved scikit-learn Pipeline. Form values are read by feature name, so field order cannot silently swap the measurements. Missing, nonfinite and nonpositive values return HTTP 400.
+
+The interface accepts decimals, keeps the submitted measurements visible and works at desktop and mobile widths. The screenshot shows the locally running app, not a mockup.
 
 ## Run locally
 
@@ -12,13 +23,7 @@ python train.py
 python flask-app.py
 ```
 
-Open `http://127.0.0.1:5000`. Enter sepal length, sepal width, petal length and petal width in centimetres. Decimal values are accepted.
-
-## Implementation
-
-`train.py` uses a fixed, stratified 70/30 split of the bundled `iris.csv`. A scikit-learn `Pipeline` saves the fitted scaler together with the classifier, so prediction uses the same transformation as training. `main.py` remains an alias for training. The web form reads features by name rather than submission order and rejects missing, nonfinite and nonpositive inputs.
-
-Train your own `model.pkl`; the generated pickle is excluded from source control. Only load pickle files you trust. The app binds to localhost and does not enable Flask debug mode by default.
+Open `http://127.0.0.1:5000`. The walkthrough includes a curl example for `POST /predict`.
 
 ## Verify
 
@@ -26,6 +31,10 @@ Train your own `model.pkl`; the generated pickle is excluded from source control
 python -m unittest discover -s tests -v
 ```
 
-Tests exercise decimal input, reordered form fields, invalid requests and agreement with the saved pipeline. The training command prints held-out accuracy for its fixed split. This learning exercise is not an independent benchmark or a production model service.
+Tests check decimal values, reordered form fields, invalid requests and agreement between the HTTP response and the saved pipeline. GitHub Actions runs these checks.
 
-The original HTML template credits [this CodePen](https://codepen.io/frytyler/pen/EGdtg); that attribution is retained in the template.
+## Scope
+
+The bundled Iris data uses a fixed stratified 70/30 split. Training prints held-out accuracy for that split; it is not an independent benchmark. The generated `model.pkl` stays outside source control. Load only models you trust.
+
+The app binds to localhost with debug disabled. This is a learning demonstration. The original form reference to [this CodePen](https://codepen.io/frytyler/pen/EGdtg) is retained in the HTML.
